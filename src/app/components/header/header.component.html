@@ -1,0 +1,59 @@
+<div class="header-cnt">
+    <div class="header_book">
+    <img src="assets/book1.png">
+    <p>BookStore</p>
+    </div>
+    <div class="search-container">
+        <mat-icon class="search-icon" svgIcon="search-icon" aria-hidden="false" aria-label="Search SVG icon"></mat-icon>
+        <input type="text"  class="search-input" placeholder="Search..." (input)="handleSerachString()" [(ngModel)]="searchString">
+    </div>
+   
+    <div class="profile_icon">
+
+<div class="profile-text">
+    <mat-icon class="profile-icon" [matMenuTriggerFor]="ProfileMenu" svgIcon="profile-icon" aria-hidden="false" aria-label="Search SVG icon"></mat-icon> 
+    <!-- [matMenuTriggerFor]="LoginPageMenu" -->
+    <p>pooja</p>
+</div>  
+
+<div class="cart-container" (click)="cartevent()">
+    <div class="cart-icon">
+        <mat-icon svgIcon="cart-icon" aria-hidden="false" aria-label="Cart SVG icon"></mat-icon>
+        <span class="cart-count">{{ cartItemCount }}</span>
+    </div>
+    <div class="cart-text">
+        <p class="cartp">Cart</p>
+    </div>
+</div>
+
+
+<div (click)="logout()" >
+    <mat-icon class="logout-icon" svgIcon="logout-icon" aria-hidden="false" aria-label="Search SVG icon"></mat-icon>
+      <p class="logoutp" >logout</p>
+</div>
+
+
+    </div>
+    
+
+   
+</div>
+
+<mat-menu #ProfileMenu="matMenu">
+    <div class="profile-history">
+        <span>Welcome</span>
+        <span>To access account and manage orders</span>
+        <div class="login-signup">
+            <button mat-button (click)="login()" class="login-btn">LOGIN/SIGNUP</button> <button (click)="logout()" class="logout-btn"><mat-icon class="logout-icon" svgIcon="logout-icon" aria-hidden="false" aria-label="Search SVG icon"></mat-icon>
+                <span>Logout</span></button>
+            <div class="order-icon" (click) ="myorder(sendOrderDetail)"> My Orders</div>
+            <div class="heart-icon"  (click) ="wishlist(sendOrderDetail)" >&#x2764; Wishlist</div>
+        </div>
+    </div>
+</mat-menu>  
+
+
+<div>
+    <router-outlet></router-outlet>
+</div>
+

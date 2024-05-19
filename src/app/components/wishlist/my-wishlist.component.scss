@@ -1,0 +1,63 @@
+.my-order-cnt-main{
+    margin-left: 250px;
+    margin-top: 0px;
+width: 1022px;
+height: 151px;
+/* UI Properties */
+background: #FFFFFF 0% 0% no-repeat padding-box;
+border: 1px solid #E4E4E4;
+opacity: 1;
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+}
+h3{
+    margin-left: 250px;
+    margin-top: 10px;
+}
+img{
+    margin-top: 20PX;
+    margin-left: 15PX;
+width: 65px;
+height: 85px;
+/* UI Properties */
+opacity: 1;
+}
+.my-order-cnt{
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+.my-order-metadata{
+    display: flex;
+    flex-direction: column;
+    margin-top: 20PX;
+    margin-left: 15PX;
+
+}
+.order-cnt-location{
+    display: flex;
+    flex-direction: row;
+}
+.deleteicon{
+    margin-top: 25PX;
+margin-left: 680px;
+}
+.wishlist-header{
+    margin-left: 250px;
+    margin-top: 20px;
+width: 1022px;
+height: 55px;
+
+// width: 1022px;
+// height: 55px;
+/* UI Properties */
+background: #F5F5F5 0% 0% no-repeat padding-box;
+border: 1px solid #E4E4E4;
+border-radius: 1px;
+opacity: 1;
+}
+.list-cnt-text{
+    margin-left: 20px;
+} 

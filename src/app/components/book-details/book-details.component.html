@@ -1,0 +1,40 @@
+<div class="bookdetails-outer-cnt">
+  <div class="back-to-dashbaord">
+    <a routerLink="/dashboard/books"><h3>Home</h3></a>
+  </div>
+  
+  <div *ngIf="sendBookDetail" class="book-details-cnt">
+    <div class="book-image-and-options">
+      <div class="book-image">
+        <img [src]="sendBookDetail.BookImage" height="300px" width="220px">
+      </div>
+      <div class="options">
+        <button mat-flat-button *ngIf="!addedToBag" class="cart-button" (click)="addToBag()">ADD TO BAG</button>
+        <div *ngIf="addedToBag" class="quantity-update">
+          <span class="symbol" (click)="decreaseCount()">-</span>
+          <span class="number-of-books">{{ count }}</span>
+          <span class="symbol" (click)="increaseCount()">+</span>
+        </div>
+        <!-- <button mat-flat-button class="wishlist-button"> WISHLIST</button> -->
+
+        <button mat-flat-button class="wishlist-button" (click)="addToWishlist()"> WISHLIST</button>
+      </div>
+    </div>
+
+    <div class="book-details">
+      <span><h2>{{ sendBookDetail.BookName }}</h2></span>
+      <span>{{ sendBookDetail.AuthorName }}</span>
+      <div class="rating-quantity">
+        <span class="rating">4.5 &#9733;</span>
+        <span>{{ sendBookDetail.Quantity }}</span>
+      </div>
+      <span><b>Rs. {{ sendBookDetail.Price }}</b></span>
+      <hr>
+      <span><b>Book Description</b></span>
+      <span>{{ sendBookDetail.Description }}</span>
+      <hr>
+      <span><b>Customer Feedback</b></span>
+      <span class="stars">  &#9733; &#9733; &#9733; &#9733;&#9733;</span>
+    </div>
+  </div>
+</div>

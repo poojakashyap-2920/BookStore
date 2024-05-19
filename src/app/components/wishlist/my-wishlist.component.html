@@ -1,0 +1,41 @@
+
+  <div class="wishlist-header">
+    <span class="list-cnt-text">
+      <b>My Wishlist ({{ sendMyWishlistDetail.length }})</b>
+      /<a routerLink="/dashboard/books">Home</a>
+    </span>
+  </div>
+
+
+  
+  <ng-container *ngIf="sendMyWishlistDetail.length > 0; else emptyWishlist">
+    <ng-container *ngFor="let book of sendMyWishlistDetail; let i = index">
+      <div class="my-order-cnt-main">
+        <div class="order-cnt-location">
+
+          <div class="my-order-cnt">
+            <div><img [src]="book.BookImage" alt="{{ book.BookName }}"></div>
+            <div class="my-order-metadata">
+              <span><h2>{{book.BookName}}</h2></span>
+              <span>{{book.AuthorName}}</span>
+              <span><b>Rs.{{book.Price}}</b></span>
+            </div>
+          </div>
+          <div class="deleteicon">
+            <!-- <mat-icon class="trash-icon" svgIcon="trash-icon" aria-hidden="false" aria-label="Delete"></mat-icon>  -->
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  
+  <ng-template #emptyWishlist>
+    <div class="empty-wishlist-message">Your wishlist is empty.</div>
+  </ng-template>
+  
+
+
+
+
+  

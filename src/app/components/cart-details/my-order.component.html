@@ -1,0 +1,31 @@
+
+
+<div class="main-cart-cnt" *ngIf="sendMyOrderDetail && sendMyOrderDetail.length > 0">
+  <div class="cart-header">
+    <div>My cart ({{ sendMyOrderDetail.length }})/<a routerLink="/dashboard/books">Home</a></div>
+  </div>
+  <div *ngFor="let item of sendMyOrderDetail" class="cartdetail-image-with-text">
+    <div><img [src]="item.BookImage" alt="{{ item.BookName }}"></div>
+    <div class="cart-meta-text">
+      <span class="bookname"><b>{{ item.BookName }}</b></span>
+      <span>{{ item.AuthorName }}</span>
+      <span>
+        <b>Total Cart Price: Rs. {{ item.Price }} * {{item.Quantity }} </b>
+      </span>
+    </div>
+    <div class="removewithicon">
+      <span><button (click)="handleCartQuantity(item, 'decrement')">-</button></span>
+      <span>{{ item.Quantity }}</span>
+      <span><button (click)="handleCartQuantity(item, 'increment')">+</button></span>
+      <span class="remove-button" (click)="removeFromCart(item)">Remove</span>
+    </div>
+    <button class="placeholder-btn" (click)="placeOrder()">PLACE ORDER</button>
+
+  </div>
+</div>
+<div *ngIf="!sendMyOrderDetail || sendMyOrderDetail.length === 0">No items in the cart</div>
+
+
+
+
+    
