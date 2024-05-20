@@ -1,5 +1,3 @@
-
-
 <div class="main-cart-cnt" *ngIf="sendMyOrderDetail && sendMyOrderDetail.length > 0">
   <div class="cart-header">
     <div>My cart ({{ sendMyOrderDetail.length }})/<a routerLink="/dashboard/books">Home</a></div>
@@ -20,12 +18,53 @@
       <span class="remove-button" (click)="removeFromCart(item)">Remove</span>
     </div>
     <button class="placeholder-btn" (click)="placeOrder()">PLACE ORDER</button>
-
   </div>
 </div>
 <div *ngIf="!sendMyOrderDetail || sendMyOrderDetail.length === 0">No items in the cart</div>
+<div class="address-main-cnt" *ngIf="isLoggedIn && showAddressSummary">
+  <div>
+    <div>
+      <h2>Customer Details</h2>
+    </div>
+    <div>
+      <mat-form-field appearance="outline" class="name-field">
+        <mat-label>Full Name</mat-label>
+        <input matInput placeholder="Enter full name">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="number-field">
+        <mat-label>Mobile Number</mat-label>
+        <input matInput placeholder="Enter mobile number">
+      </mat-form-field>
+    </div>
+  </div>
 
+  <div class="address1">
+    <span>1.WORK</span>
+    <span>Address</span>
+    <span><textarea matInput placeholder="Enter work address"></textarea></span>
+  </div>
 
+  <div class="city-state">
+    <mat-form-field appearance="outline" class="city-field">
+      <mat-label>City/Town</mat-label>
+      <input matInput placeholder="Enter city/town">
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="state-field">
+      <mat-label>State</mat-label>
+      <input matInput placeholder="Enter state">
+    </mat-form-field>
+  </div>
 
+  <div class="address2">
+    <span>2.HOME</span>
+    <span>Address</span>
+    <span><textarea matInput placeholder="Enter home address"></textarea></span>
+  </div>
 
-    
+  <div class="btn">
+    <button mat-button color="primary">Add New Address</button>
+    <button mat-button color="accent" (click)="handleContinue()">CONTINUE</button>
+    <button mat-button color="primary">Edit</button>
+    <button mat-button color="warn">Remove</button>
+  </div>
+</div>

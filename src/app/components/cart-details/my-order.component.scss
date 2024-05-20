@@ -153,3 +153,59 @@
    margin-bottom: -70px;
   }
   
+
+  /*  addresss  */
+
+  .address-main-cnt{
+  
+    width: 700px;
+    height: 400px;
+    margin-left: 200px;
+    margin-top: 100px;
+    padding: 20px;
+    /* UI Properties */
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    border: 1px solid #DCDCDC;
+    border-radius: 1px;
+    opacity: 1;
+    }
+    // .name-field{
+      
+    // }
+    .number-field{
+    margin-left: 10px;
+    }
+    .address1{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .address2{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .state-field{
+        margin-left: 10px;
+    }
+    .city-state{
+    margin-top: 10px;
+    }
+    .btn{
+        display: flex;
+        flex-direction: column;
+        float: left;
+    }
+    .continue-btn{
+        /* Layout Properties */
+    
+    /* UI Properties */
+    text-align: left;
+    font: normal normal medium 14px/17px Lato;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+    background-color: blue;
+    text-transform: uppercase;
+    opacity: 1;
+    margin-left: 450px;
+    }

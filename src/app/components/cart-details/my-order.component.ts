@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { BookObj } from 'src/assets/type';
+import { BackendCartItem } from 'src/assets/type';
 import { CartserviceService } from '../service/cartService/cartservice.service';
 import { Subscription } from 'rxjs';
+import { LoginSignupMainComponent } from '../login-signup-main/login-signup-main.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-my-order',
@@ -12,14 +15,16 @@ export class MyOrderComponent implements OnInit {
   addedToBag: boolean = false;
   count: number = 1;
   sendMyOrderDetail: BookObj[] = [];
-
-  
+  isLoggedIn: boolean = false;
+  backendItem: BackendCartItem[] =[];
+  showAddressSummary = false;
  
 
-  constructor(private cartService: CartserviceService) { }
+  constructor(private cartService: CartserviceService,private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.sendMyOrderDetail = this.cartService.getCartItemsFromStorage();
+    this.isLoggedIn = localStorage.getItem('AuthToken') !== null;
 
     if (localStorage.getItem('AuthToken') !== null) {
       this.cartService.getAllCartApi().subscribe(
@@ -33,26 +38,20 @@ export class MyOrderComponent implements OnInit {
       this.cartService.cartItems$.subscribe(items => {
         this.sendMyOrderDetail = items;
         console.log("Local Cart Items:", items);
-      });
-
-     
+      }); 
     }
-  }
+   }
 
-
-
-
-
-  handleCartQuantity(item: BookObj, action: string) {
+   handleCartQuantity(item: BookObj, action: string) {
     const isLoggedIn = localStorage.getItem('AuthToken') !== null;
-    const newQuantity = action === 'increment' ? (item.Quantity || 1) + 1 : (item.Quantity || 1) - 1;
-
+    const currentQuantity = item.Quantity !== undefined ? item.Quantity : 1; 
+    const newQuantity = action === 'increment' ? currentQuantity + 1 : currentQuantity - 1;
+  
     if (newQuantity > 0) {
       if (isLoggedIn) {
         this.cartService.updateCartQuantityApiCall(item.BookId!, newQuantity).subscribe(
           res => {
             console.log("Quantity updated via API:", res);
-            // Refresh cart items from API after update
             this.cartService.getAllCartApi().subscribe(
               cartItems => {
                 this.sendMyOrderDetail = cartItems;
@@ -68,52 +67,59 @@ export class MyOrderComponent implements OnInit {
         this.cartService.updateQuantity(item, newQuantity);
       }
     }
+}
+
+  
+
+  removeFromCart(item: BookObj) {
+    const bookId = item.BookId;
+    if (localStorage.getItem('AuthToken') !== null) {
+      if (bookId !== undefined && bookId !== null) {
+        this.cartService.removeCartApiCall(bookId).subscribe(
+          res => {
+            console.log(res);
+            console.log("Item removed from cart:", item);
+            this.cartService.getAllCartApi().subscribe(
+              cartItems => {
+                this.sendMyOrderDetail = cartItems;
+              },
+              error => {
+                console.error("Error fetching cart items after removal:", error);
+              }
+            );
+          },
+          err => console.error("Error removing item from cart:", err)
+        );
+      }
+    } else {
+      this.cartService.removeItem(item);
+    }
   }
-
-
-
 
   placeOrder() {
-    // Implement order placement logic
-  }
-
-  
-  
-  removeFromCart(item: BookObj) {
-    const bookId = item.BookId; // Accessing bookId directly from the item object
-    console.log("Item:", item); // Log the item object to inspect its structure
-
-    console.log("bookId:", bookId); 
-  console.log("bookId:", bookId); 
-  if (localStorage.getItem('AuthToken') !== null) {
-    if (bookId !== undefined && bookId !== null) {
-      this.cartService.removeCartApiCall(bookId).subscribe(
-        res => {
-          console.log(res);
-          console.log("Item removed from cart:", item);
-          // Refresh cart items from API after removal
-          this.cartService.getAllCartApi().subscribe(
-            cartItems => {
-              this.sendMyOrderDetail = cartItems;
-            },
-            error => {
-              console.error("Error fetching cart items after removal:", error);
-            }
-          );
-        },
-        err => console.error("Error removing item from cart:", err)
-      );
+    if (localStorage.getItem('AuthToken') !== null) {
+      this.showAddressSummary = true;
     }
-  } else {
-    this.cartService.removeItem(item);
-    // Update cart items after removing book
-    // this.sendMyOrderDetail = this.cartService.getCartItems(); // Assuming you have a method to retrieve local cart items
+   else {
+      const dialogRef = this.dialog.open(LoginSignupMainComponent, {
+        width: '600px', 
+        disableClose: true, 
+        autoFocus: false, 
+      });
+      this.showAddressSummary = true;
+  
+      
+    }
   }
+  
+
+  openAddressDetails() {
+    
+  }
+
+
+
+
+  handleContinue(){}
 }
-
-
-
-}
-
-
 
