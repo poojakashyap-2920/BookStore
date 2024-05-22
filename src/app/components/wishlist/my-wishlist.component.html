@@ -21,7 +21,8 @@
               <span><b>Rs.{{book.Price}}</b></span>
             </div>
           </div>
-          <div class="deleteicon">
+          <div class="deleteicon" (click)="removeFromWishlist(book)">
+            remove
             <!-- <mat-icon class="trash-icon" svgIcon="trash-icon" aria-hidden="false" aria-label="Delete"></mat-icon>  -->
           </div>
         </div>
