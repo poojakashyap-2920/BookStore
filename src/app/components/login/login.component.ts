@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../service/userService/user.service';
 import { CartserviceService } from '../service/cartService/cartservice.service';
+import { BookObj } from 'src/assets/type';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +40,7 @@ export class LoginComponent implements OnInit {
     this.userService.loginApiCall(email, password).subscribe(
       (res) => {
         console.log('Login API Response:', res);
-        localStorage.setItem("AuthToken", res.token);
+        localStorage.setItem("AuthToken", res.token);+
         console.log(localStorage.getItem('AuthToken')); // Log the token to verify
 
         this.onSuccessfulLogin();
@@ -49,16 +50,28 @@ export class LoginComponent implements OnInit {
         this.errorMessage = 'Login failed. Please check your credentials and try again.';
       }
     );
+    //window.location.reload();
   }
 
   onSuccessfulLogin() {
     this.compareAndUpdateCartData();
-
-    if (this.checkCartDataMatch() && this.checkCartQuantitiesMatch()) {
+    this.compareAndUpdateWishlistData(); // Add method for updating wishlist data
+  
+    if (this.checkCartDataMatch() && this.checkCartQuantitiesMatch() && this.checkWishlistDataMatch()) {
       this.navigateToAddressSummary();
     } else {
+      console.error('Cart or Wishlist data does not match.');
     }
   }
+  
+  // onSuccessfulLogin() {
+  //   this.compareAndUpdateCartData();
+
+  //   if (this.checkCartDataMatch() && this.checkCartQuantitiesMatch()) {
+  //     this.navigateToAddressSummary();
+  //   } else {
+  //   }
+  // }
 
 
   checkCartDataMatch(): boolean {
@@ -120,9 +133,66 @@ export class LoginComponent implements OnInit {
     );
   }
   
+
+  compareAndUpdateWishlistData() {
+    this.cartService.getAllWishListApi().subscribe(
+      (backendResponse) => {
+        const backendItems = backendResponse.data;
+        const localItems = this.cartService.getWishlistItemsFromStorage();
+  
+        localItems.forEach((localItem: any) => {
+          const backendItemIndex = backendItems.findIndex(
+            (item: { BookId: number | undefined }) => item.BookId === localItem.BookId
+          );
+          if (backendItemIndex === -1) {
+            this.cartService.addToWishlistApiCall({ bookId: localItem.BookId }).subscribe(
+              () => {
+                console.log("Item added to wishlist in backend:", localItem);
+              },
+              (error) => {
+                console.error("Error adding item to wishlist in backend:", localItem, error);
+              }
+            );
+          } else {
+            console.log("Item already in wishlist in backend:", localItem);
+          }
+        });
+  
+        // Add items from the backend to local storage if they don't exist in local storage
+        backendItems.forEach((backendItem: any) => {
+          const localItemIndex = localItems.findIndex(
+            (item: { BookId: number | undefined }) => item.BookId === backendItem.BookId
+          );
+          if (localItemIndex === -1) {
+            // Item doesn't exist in local storage, add it
+            localItems.push(backendItem);
+          } else {
+            console.log("Item already in wishlist in local storage:", backendItem);
+          }
+        });
+  
+        // Save updated local items to local storage
+        this.cartService.saveWishlistItemsToStorage(localItems);
+      },
+      (error) => {
+        console.error('Error fetching wishlist items from backend:', error);
+      }
+    );
+  }
+  
+  
+  checkWishlistDataMatch(): boolean {
+    const backendItems = this.cartService.getWishlistItemsFromStorage();
+    const localItems = this.cartService.getWishlistItemsFromStorage();
+    return backendItems.length === localItems.length;
+  }
+  
   
 
   navigateToAddressSummary() {
     this.router.navigate(['/address-summary']);
   }
 }
+
+/********************************************************************************************************************************************************* */
+
