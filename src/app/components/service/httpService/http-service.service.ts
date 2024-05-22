@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { AddressObj } from 'src/assets/type';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,7 @@ private staticTokenHeader = new HttpHeaders({
   }) 
  constructor(private http: HttpClient) { }
 
+/* ******************************** user ********************************************** */
   loginApi(email: string, password: string): Observable<any> {
     return this.http.post(`https://localhost:7142/api/User/Login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {});
   }
@@ -30,12 +32,14 @@ private staticTokenHeader = new HttpHeaders({
     return this.http.post(`https://localhost:7142/api/User`, body);
   }
 
+
+  /* ********************************** book ****************************************************** */
   getAllBook(): Observable<any> {
     return this.http.get(`https://localhost:7142/api/Book/GetAll`);
   }
 
 
-
+ /* ***************************************** cart ****************************************************** */
   addToCartApiCall(body:{bookId:any,quantity:any}): Observable<any> {
     return this.http.post('https://localhost:7142/api/Cart', body, { headers: this.staticTokenHeader })
       
@@ -47,7 +51,7 @@ private staticTokenHeader = new HttpHeaders({
   
  
   removeToCartApiCall(bookId: number) {
-    return this.http.delete(`https://localhost:7142/api/Cart/DeleteCart/${bookId}`,{ headers: this.authHeader });
+    return this.http.delete(`https://localhost:7142/api/Cart/DeleteCart/${bookId}`,{ headers: this.staticTokenHeader  });
   }
   
   
@@ -56,4 +60,43 @@ private staticTokenHeader = new HttpHeaders({
      return this.http.get(`https://localhost:7142/api/Cart`,{headers: this.authHeader})
    }
   
+   /******************************************** WishList  ****************************************************** */
+
+   getallWishList():Observable<any>
+   {
+    return this.http.get(`https://localhost:7142/api/WishList`,{headers:this.staticTokenHeader})
+   }
+
+
+   addToWishList(body:{bookId:any})
+   {
+    return this.http.post(`https://localhost:7142/api/WishList`,body,{ headers: this.staticTokenHeader })
+   }
+
+   
+  removeToWishList(bookId: number) {
+    return this.http.delete(`https://localhost:7142/api/WishList/${bookId}`,{ headers: this.staticTokenHeader  });
+  }
+ 
+/** **************************************   address api  ************************************************************ */
+  getAllAddress():Observable<any>
+  {
+    return this.http.get(`https://localhost:7142/api/Address`,{ headers: this.staticTokenHeader  })
+  }
+
+
+  // editAddress(phoneNumber: number, address: string): Observable<any> {
+  //   return this.http.patch(`https://localhost:7142/api/Address/${phoneNumber}`, { address }, { headers: this.staticTokenHeader  });
+  // }
+  
+
+  addCustomerAddress(body:AddressObj):Observable<any>
+  {
+   return this.http.post(`https://localhost:7142/api/Address`,body,{headers: this.authHeader})
+  }
+
+  // removeCustomerAddress(phoneNumber: number,address: string,)
+  // {
+  //   return this.http.delete(`https://localhost:7142/api/Address/${phoneNumber}`,{address},{headers: this.authHeader})
+  // }
 }
