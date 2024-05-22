@@ -69,18 +69,17 @@ export class CartserviceService {
     return this.http.addToCartApiCall(data);
   }
 
+
   updateCartQuantityApiCall(bookId: number, quantity: number): Observable<any> {
-    return this.http.updateCartQuantity(bookId,quantity);
-  }
+    return this.http.updateCartQuantity(bookId, quantity);
+}
+
 
   removeCartApiCall(bookId:number)
   {
     return this.http.removeToCartApiCall(bookId);
   }
-  // addToCartApiCall(data: { bookId: any, quantity: any }) {
-  //   return this.httpService.addToCartApi("/Cart/AddBookToCart", data);
-  // }
-
+ 
 
   getAllCartApi()
   {
@@ -109,12 +108,17 @@ export class CartserviceService {
     if (!existingItem) {
       this.wishlistItems.push(book);
       this.saveWishlistItemsToLocalStorage();
+      console.log(existingItem)
     }
   }
 
-
-
   
+
+  // Get wishlist items from storage
+getWishlistItemsFromStorage() {
+  const items = localStorage.getItem('wishlistItems');
+  return items ? JSON.parse(items) : [];
+}
   removeFromWishlist(book: BookObj) {
     this.wishlistItems = this.wishlistItems.filter(item => item.BookId !== book.BookId);
     this.saveWishlistItemsToLocalStorage();
@@ -129,11 +133,42 @@ export class CartserviceService {
     localStorage.setItem('wishlistItems', JSON.stringify(this.wishlistItems));
     this.wishlistItemsSubject.next(this.wishlistItems);
   }
+
+
+  //******************************** */
+
+  saveCartItemsToStorage(cartItems: BookObj[]) {
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    this.cartItemsSubject.next(cartItems);
+  }
+
+  /******************************   wishlist  ********************************** */ 
+
+
+
+  // Save wishlist items to storage
+saveWishlistItemsToStorage(items: any[]) {
+  localStorage.setItem('wishlistItems', JSON.stringify(items));
 }
 
 
 
+  addToWishlistApiCall(data:{bookId: any}) {
+    return this.http.addToWishList(data);
+  }
 
 
+  
+  removeWishListApiCall(bookId:number)
+  {
+    return this.http.removeToWishList(bookId);
+  }
 
+
+  getAllWishListApi()
+  {
+    return this.http.getallWishList();
+  }
+}
+/********************************************************************************************************************************** */
 
