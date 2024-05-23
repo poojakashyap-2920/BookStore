@@ -21,50 +21,108 @@
   </div>
 </div>
 <div *ngIf="!sendMyOrderDetail || sendMyOrderDetail.length === 0">No items in the cart</div>
-<div class="address-main-cnt" *ngIf="isLoggedIn && showAddressSummary">
-  <div>
-    <div>
-      <h2>Customer Details</h2>
+
+
+
+
+<div class="showcustomerDetails" style="border: 1px solid #ccc; padding: 10px;" class ="main-address-out-cnt">
+  <h2>Customer Details</h2>
+  <div *ngIf="showAddressDetails" class="main-address-cnt">
+    <div *ngIf="customerAddresses.length > 0; else noAddress">
+      <div *ngFor="let address of customerAddresses" style="border-bottom: 1px solid #ccc; padding: 10px;">
+        <div class="address-container">
+          <h4>{{ address.FullAdress }}</h4>
+          <h4>{{ address.city }}</h4> 
+          <h4>{{ address.state}}</h4> 
+          <h4>{{address.Name}}</h4>
+          <h4>{{address.mobileNumber}}</h4>
+
+         <div class="edit-remove-btn">
+           <button mat-icon-button class="edit-address-btn" (click)="editAddress(address)">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        <button mat-icon-button class="remove-address-btn" (click)="removeAddress(address)">
+          <mat-icon>delete</mat-icon>remove
+        </button>
+      </div>
+
+
+        </div>
+      </div>
     </div>
-    <div>
-      <mat-form-field appearance="outline" class="name-field">
-        <mat-label>Full Name</mat-label>
-        <input matInput placeholder="Enter full name">
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="number-field">
-        <mat-label>Mobile Number</mat-label>
-        <input matInput placeholder="Enter mobile number">
-      </mat-form-field>
+    <ng-template #noAddress>
+      <p>No addresses are present. Create new address.</p>
+    </ng-template>
+    <div style="padding-top: 10px;">
+      <button mat-raised-button color="primary" class="add-address-btn" (click)="toggleAddressForm()">
+        <mat-icon>add</mat-icon> Add New Address
+      </button>
     </div>
   </div>
+</div>
 
-  <div class="address1">
-    <span>1.WORK</span>
-    <span>Address</span>
-    <span><textarea matInput placeholder="Enter work address"></textarea></span>
-  </div>
 
-  <div class="city-state">
-    <mat-form-field appearance="outline" class="city-field">
-      <mat-label>City/Town</mat-label>
-      <input matInput placeholder="Enter city/town">
-    </mat-form-field>
-    <mat-form-field appearance="outline" class="state-field">
-      <mat-label>State</mat-label>
-      <input matInput placeholder="Enter state">
-    </mat-form-field>
-  </div>
-
-  <div class="address2">
-    <span>2.HOME</span>
-    <span>Address</span>
-    <span><textarea matInput placeholder="Enter home address"></textarea></span>
-  </div>
-
-  <div class="btn">
-    <button mat-button color="primary">Add New Address</button>
-    <button mat-button color="accent" (click)="handleContinue()">CONTINUE</button>
-    <button mat-button color="primary">Edit</button>
-    <button mat-button color="warn">Remove</button>
-  </div>
+<div *ngIf="showAddressForm" class="customer-new-detail-cnt">
+  <form [formGroup]="addressForm" (ngSubmit)="handleaddress()">
+    <div>
+      <div>
+        <h2>New Details</h2>
+      </div>
+      <div>
+        <mat-form-field appearance="outline" class="name-field">
+          <mat-label>Full Name</mat-label>
+          <input matInput placeholder="Enter full name" formControlName="name">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="number-field">
+          <mat-label>Mobile Number</mat-label>
+          <input matInput placeholder="Enter mobile number" formControlName="mobileNumber">
+        </mat-form-field>
+      </div>
+    </div>
+  
+    <div class="address1">
+      <span>1.WORK</span>
+      <span>Address</span>
+      <span><textarea matInput placeholder="Enter work address" formControlName="FullAddress"></textarea></span>
+    </div>
+  
+    <div class="city-state">
+      <mat-form-field appearance="outline" class="city-field" >
+        <mat-label>City/Town</mat-label>
+        <input matInput placeholder="Enter city/town" formControlName="city">
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline" class="state-field">
+        <mat-label>State</mat-label>
+        <input matInput placeholder="Enter state" formControlName="state">
+      </mat-form-field>
+      
+    </div>
+  
+    <div class="address2">
+      <span>2.HOME</span>
+      <span>Address</span>
+      <span><textarea matInput placeholder="Enter home address" formControlName="FullAddress"></textarea></span>
+    </div>
+  
+    
+    
+      <div class="value">Type</div>
+      <div class="type-list">
+        <div>
+          <input type="radio" name="type" formControlName="type" value="Home"> Home
+        </div>
+        <div>
+          <input type="radio" name="type" formControlName="type" value="Work"> Work
+        </div>
+        <div>
+          <input type="radio" name="type" formControlName="type" value="Other"> Other
+        </div>
+      </div>
+ 
+    
+    <div class="continue">
+      <button mat-raised-button color="primary" class="continue-btn" type="submit">CONTINUE</button>
+    </div>
+  </form>
 </div>

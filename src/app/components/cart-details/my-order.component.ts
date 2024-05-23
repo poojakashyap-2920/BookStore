@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { BookObj } from 'src/assets/type';
+import { AddressObj, BookObj } from 'src/assets/type';
 import { BackendCartItem } from 'src/assets/type';
 import { CartserviceService } from '../service/cartService/cartservice.service';
 import { Subscription } from 'rxjs';
 import { LoginSignupMainComponent } from '../login-signup-main/login-signup-main.component';
 import { MatDialog } from '@angular/material/dialog';
+import { AddressserviceService } from '../service/addressservice/addressservice.service';
+import { log } from 'console';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Route, Router } from '@angular/router';
 
 @Component({
   selector: 'app-my-order',
@@ -17,10 +21,25 @@ export class MyOrderComponent implements OnInit {
   sendMyOrderDetail: BookObj[] = [];
   isLoggedIn: boolean = false;
   backendItem: BackendCartItem[] =[];
-  showAddressSummary = false;
+  showAddressForm: boolean = false;
  
+  addressForm: FormGroup;
+ 
+  customerAddresses: AddressObj[] = [];
+  showAddressDetails: boolean = false;  // Add this flag to control address display
 
-  constructor(private cartService: CartserviceService,private dialog: MatDialog) { }
+  constructor(private cartService: CartserviceService,private dialog: MatDialog,private addressService:AddressserviceService, private fb: FormBuilder,private router:Router) { 
+    this.addressForm = this.fb.group({
+      name: ['', Validators.required],
+      mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      FullAddress: ['', Validators.required],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      type: ['Home', Validators.required],
+      homeAddress: ['']
+    });
+
+  }
 
   ngOnInit(): void {
     this.sendMyOrderDetail = this.cartService.getCartItemsFromStorage();
@@ -40,6 +59,8 @@ export class MyOrderComponent implements OnInit {
         console.log("Local Cart Items:", items);
       }); 
     }
+  
+   
    }
 
    handleCartQuantity(item: BookObj, action: string) {
@@ -96,30 +117,109 @@ export class MyOrderComponent implements OnInit {
     }
   }
 
+  /*********************************************address ************************************************ */
+ 
+
   placeOrder() {
-    if (localStorage.getItem('AuthToken') !== null) {
-      this.showAddressSummary = true;
-    }
-   else {
+    if (this.isLoggedIn) {
+      this.addressService.getAddressApiCall().subscribe(
+        res => {
+          this.customerAddresses = res;
+          console.log(res)
+          this.showAddressDetails = true;  // Set the flag to true to show address details
+          console.log(res)
+        },
+        err => {
+          console.error(err);
+          this.customerAddresses = [];
+          this.showAddressDetails = true;  // Set the flag to true even if there are no addresses
+        }
+      );
+    } else {
       const dialogRef = this.dialog.open(LoginSignupMainComponent, {
-        width: '600px', 
-        disableClose: true, 
-        autoFocus: false, 
+        width: '600px',
+        disableClose: true,
+        autoFocus: false,
       });
-      this.showAddressSummary = true;
+      dialogRef.afterClosed().subscribe(result=>{
+        if(this.isLoggedIn){dialogRef.close()}
+     } )
+    }
+  }
+
   
-      
+  
+  
+
+  addNewAddress()
+  {
+    this.showAddressForm = true; // Show the address form
+
+  }
+  editAddress(address:AddressObj)
+  {
+
+  }
+  
+
+  handleaddress() {
+    if (this.addressForm.valid) {
+      const newAddress: AddressObj = this.addressForm.value;
+      this.addressService.addCustomerAddressApiCall(newAddress).subscribe(
+        (response: any) => {
+          
+          console.log("New address added:", response);
+          
+          this.addressForm.reset(); 
+          this.addressService.getAddressApiCall().subscribe(
+            (response:any)=>{
+              
+            }
+          );
+          // Reset the form after successful submission
+        },
+        (error: any) => {
+          console.error("Error adding new address:", error);
+
+        }
+      );
+    } else {
+      // Mark all form controls as touched to trigger validation messages
+      Object.keys(this.addressForm.controls).forEach(controlName => {
+        this.addressForm.get(controlName)?.markAsTouched();
+      });
+    }
+  }
+
+  toggleAddressForm() {
+    // Toggle the visibility of the address form
+    this.showAddressForm = !this.showAddressForm;
+  }
+
+
+
+
+
+
+  removeAddress(address: AddressObj) {
+    const phoneNumber = address.mobileNumber; // Assuming mobileNumber corresponds to phoneNumber
+    console.log(phoneNumber);
+    if (this.isLoggedIn && phoneNumber !== undefined && phoneNumber !== null) {
+      this.addressService.removeAddressApiCall(phoneNumber).subscribe(
+        () => {
+          
+          console.log("Address removed successfully:", address);
+          // Update the local list of addresses
+          this.customerAddresses = this.customerAddresses.filter(a => a.mobileNumber !== phoneNumber);
+
+        },
+        error => console.error("Error removing address:", error)
+      );
+    } else {
+      console.log("User is not authenticated or phone number is invalid. Cannot remove address.");
     }
   }
   
-
-  openAddressDetails() {
-    
-  }
-
-
-
-
-  handleContinue(){}
+  
 }
 
