@@ -90,13 +90,14 @@ private staticTokenHeader = new HttpHeaders({
   // }
   
 
-  addCustomerAddress(body:AddressObj):Observable<any>
-  {
-   return this.http.post(`https://localhost:7142/api/Address`,body,{headers: this.authHeader})
+  addCustomerAddress(address: AddressObj): Observable<any> {
+    // Assuming you have authentication headers defined somewhere (this.authHeader)
+    // Make sure the URL is correct and matches the server endpoint
+    return this.http.post('https://localhost:7142/api/Address', address, { headers: this.staticTokenHeader  });
   }
 
-  // removeCustomerAddress(phoneNumber: number,address: string,)
-  // {
-  //   return this.http.delete(`https://localhost:7142/api/Address/${phoneNumber}`,{address},{headers: this.authHeader})
-  // }
+  removeCustomerAddress(phoneNumber: number):Observable<any>
+  {
+    return this.http.delete(`https://localhost:7142/api/Address/${phoneNumber}`,{ headers: this.staticTokenHeader  })
+  }
 }
