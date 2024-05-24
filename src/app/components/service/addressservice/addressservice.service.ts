@@ -28,4 +28,9 @@ export class AddressserviceService {
   {
     return this.httpservice.removeCustomerAddress(phoneNumber);
   }
+  editAddressApiCall(addressId: number, body: AddressObj)
+   {
+    return this.httpservice.editAddressApiCall(addressId, body);
+  }
+  
 }
