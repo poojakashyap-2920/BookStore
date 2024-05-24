@@ -22,31 +22,26 @@
 </div>
 <div *ngIf="!sendMyOrderDetail || sendMyOrderDetail.length === 0">No items in the cart</div>
 
-
-
-
-<div class="showcustomerDetails" style="border: 1px solid #ccc; padding: 10px;" class ="main-address-out-cnt">
+<div class="showcustomerDetails" style="border: 1px solid #ccc; padding: 10px;" class="main-address-out-cnt">
   <h2>Customer Details</h2>
   <div *ngIf="showAddressDetails" class="main-address-cnt">
     <div *ngIf="customerAddresses.length > 0; else noAddress">
       <div *ngFor="let address of customerAddresses" style="border-bottom: 1px solid #ccc; padding: 10px;">
         <div class="address-container">
-          <h4>{{ address.FullAdress }}</h4>
-          <h4>{{ address.city }}</h4> 
-          <h4>{{ address.state}}</h4> 
-          <h4>{{address.Name}}</h4>
-          <h4>{{address.mobileNumber}}</h4>
-
-         <div class="edit-remove-btn">
-           <button mat-icon-button class="edit-address-btn" (click)="editAddress(address)">
-          <mat-icon>edit</mat-icon> Edit
-        </button>
-        <button mat-icon-button class="remove-address-btn" (click)="removeAddress(address)">
-          <mat-icon>delete</mat-icon>remove
-        </button>
-      </div>
-
-
+          <h4>{{ address.Name }}</h4>
+          <h4>{{ address.MobileNumber }}</h4>
+          <h4>{{ address.FullAddress }}</h4>
+          <h4>{{ address.City }}</h4> 
+          <h4>{{ address.State }}</h4> 
+          <!-- Edit and remove buttons -->
+          <div class="edit-remove-btn">
+            <button mat-icon-button class="edit-address-btn" (click)="editAddress(address)">
+              <mat-icon>edit</mat-icon> Edit
+            </button>
+            <button mat-icon-button class="remove-address-btn" (click)="removeAddress(address)">
+              <mat-icon>delete</mat-icon> Remove
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -61,9 +56,8 @@
   </div>
 </div>
 
-
 <div *ngIf="showAddressForm" class="customer-new-detail-cnt">
-  <form [formGroup]="addressForm" (ngSubmit)="handleaddress()">
+  <form [formGroup]="addressForm" (ngSubmit)="continueOrder()">
     <div>
       <div>
         <h2>New Details</h2>
@@ -71,11 +65,11 @@
       <div>
         <mat-form-field appearance="outline" class="name-field">
           <mat-label>Full Name</mat-label>
-          <input matInput placeholder="Enter full name" formControlName="name">
+          <input matInput placeholder="Enter full name" formControlName="Name">
         </mat-form-field>
         <mat-form-field appearance="outline" class="number-field">
           <mat-label>Mobile Number</mat-label>
-          <input matInput placeholder="Enter mobile number" formControlName="mobileNumber">
+          <input matInput placeholder="Enter mobile number" formControlName="MobileNumber">
         </mat-form-field>
       </div>
     </div>
@@ -89,12 +83,12 @@
     <div class="city-state">
       <mat-form-field appearance="outline" class="city-field" >
         <mat-label>City/Town</mat-label>
-        <input matInput placeholder="Enter city/town" formControlName="city">
+        <input matInput placeholder="Enter city/town" formControlName="City">
       </mat-form-field>
       
       <mat-form-field appearance="outline" class="state-field">
         <mat-label>State</mat-label>
-        <input matInput placeholder="Enter state" formControlName="state">
+        <input matInput placeholder="Enter state" formControlName="State">
       </mat-form-field>
       
     </div>
@@ -105,24 +99,41 @@
       <span><textarea matInput placeholder="Enter home address" formControlName="FullAddress"></textarea></span>
     </div>
   
-    
-    
-      <div class="value">Type</div>
-      <div class="type-list">
-        <div>
-          <input type="radio" name="type" formControlName="type" value="Home"> Home
-        </div>
-        <div>
-          <input type="radio" name="type" formControlName="type" value="Work"> Work
-        </div>
-        <div>
-          <input type="radio" name="type" formControlName="type" value="Other"> Other
-        </div>
+    <div class="value">Type</div>
+    <div class="type-list">
+      <div>
+        <input type="radio" name="Type" formControlName="Type" value="Home"> Home
       </div>
- 
-    
+      <div>
+        <input type="radio" name="Type" formControlName="Type" value="Work"> Work
+      </div>
+      <div>
+        <input type="radio" name="Type" formControlName="Type" value="Other"> Other
+      </div>
+    </div>
+  
     <div class="continue">
       <button mat-raised-button color="primary" class="continue-btn" type="submit">CONTINUE</button>
     </div>
   </form>
 </div>
+
+<div class="showcustomerDetails" style="border: 1px solid #ccc; padding: 10px;">
+  <h2>Order Summary</h2>
+  <div *ngIf="!showOrderSummary">
+    <!-- <span>Order Summary will be shown here after you click "CONTINUE".</span> -->
+  </div>
+  <ng-container *ngIf="showOrderSummary">
+    <!-- Product Details Section -->
+    <div class="product-details">
+      <h2>Product Details</h2>
+      <div *ngFor="let item of sendMyOrderDetail" class="product-details-item">
+        <div><img [src]="item.BookImage" alt="{{ item.BookName }}"></div>
+        <div>
+          <span class="bookname"><b>{{ item.BookName }}</b></span>
+          <span>{{ item.AuthorName }}</span>
+          <span><b>Price: Rs. {{ item.Price }}</b></span>
+          <span><b>Quantity: {{ item.Quantity }}</b></span>
+          <span><b>Total: Rs. {{ item.Price }} * {{item.Quantity }}</b></span>
+        </div>
+      </div>

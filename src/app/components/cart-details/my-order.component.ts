@@ -2,13 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { AddressObj, BookObj } from 'src/assets/type';
 import { BackendCartItem } from 'src/assets/type';
 import { CartserviceService } from '../service/cartService/cartservice.service';
-import { Subscription } from 'rxjs';
-import { LoginSignupMainComponent } from '../login-signup-main/login-signup-main.component';
 import { MatDialog } from '@angular/material/dialog';
 import { AddressserviceService } from '../service/addressservice/addressservice.service';
-import { log } from 'console';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Route, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { LoginSignupMainComponent } from '../login-signup-main/login-signup-main.component';
 
 @Component({
   selector: 'app-my-order',
@@ -20,32 +18,39 @@ export class MyOrderComponent implements OnInit {
   count: number = 1;
   sendMyOrderDetail: BookObj[] = [];
   isLoggedIn: boolean = false;
-  backendItem: BackendCartItem[] =[];
+  backendItem: BackendCartItem[] = [];
   showAddressForm: boolean = false;
- 
   addressForm: FormGroup;
- 
   customerAddresses: AddressObj[] = [];
-  showAddressDetails: boolean = false;  // Add this flag to control address display
+  showAddressDetails: boolean = false;
+  showOrderSummary: boolean = false;
+  showProductDetails: boolean = false;
+  isEditing: boolean = false;
+  editingAddressId: any;
 
-  constructor(private cartService: CartserviceService,private dialog: MatDialog,private addressService:AddressserviceService, private fb: FormBuilder,private router:Router) { 
+  constructor(
+    private cartService: CartserviceService,
+    private dialog: MatDialog,
+    private addressService: AddressserviceService,
+    private fb: FormBuilder,
+    private router: Router
+  ) {
     this.addressForm = this.fb.group({
-      name: ['', Validators.required],
-      mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      Name: ['', Validators.required],
+      MobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       FullAddress: ['', Validators.required],
-      city: ['', Validators.required],
-      state: ['', Validators.required],
-      type: ['Home', Validators.required],
-      homeAddress: ['']
+      City: ['', Validators.required],
+      State: ['', Validators.required],
+      Type: ['Home', Validators.required],
+      HomeAddress: ['']
     });
-
   }
 
   ngOnInit(): void {
     this.sendMyOrderDetail = this.cartService.getCartItemsFromStorage();
     this.isLoggedIn = localStorage.getItem('AuthToken') !== null;
 
-    if (localStorage.getItem('AuthToken') !== null) {
+    if (this.isLoggedIn) {
       this.cartService.getAllCartApi().subscribe(
         res => {
           this.sendMyOrderDetail = res;
@@ -57,17 +62,15 @@ export class MyOrderComponent implements OnInit {
       this.cartService.cartItems$.subscribe(items => {
         this.sendMyOrderDetail = items;
         console.log("Local Cart Items:", items);
-      }); 
+      });
     }
-  
-   
-   }
+  }
 
-   handleCartQuantity(item: BookObj, action: string) {
+  handleCartQuantity(item: BookObj, action: string) {
     const isLoggedIn = localStorage.getItem('AuthToken') !== null;
-    const currentQuantity = item.Quantity !== undefined ? item.Quantity : 1; 
+    const currentQuantity = item.Quantity !== undefined ? item.Quantity : 1;
     const newQuantity = action === 'increment' ? currentQuantity + 1 : currentQuantity - 1;
-  
+
     if (newQuantity > 0) {
       if (isLoggedIn) {
         this.cartService.updateCartQuantityApiCall(item.BookId!, newQuantity).subscribe(
@@ -88,18 +91,15 @@ export class MyOrderComponent implements OnInit {
         this.cartService.updateQuantity(item, newQuantity);
       }
     }
-}
-
-  
+  }
 
   removeFromCart(item: BookObj) {
     const bookId = item.BookId;
-    if (localStorage.getItem('AuthToken') !== null) {
+    if (this.isLoggedIn) {
       if (bookId !== undefined && bookId !== null) {
         this.cartService.removeCartApiCall(bookId).subscribe(
           res => {
-            console.log(res);
-            console.log("Item removed from cart:", item);
+            console.log("Item removed from cart:", res);
             this.cartService.getAllCartApi().subscribe(
               cartItems => {
                 this.sendMyOrderDetail = cartItems;
@@ -117,22 +117,18 @@ export class MyOrderComponent implements OnInit {
     }
   }
 
-  /*********************************************address ************************************************ */
- 
-
   placeOrder() {
     if (this.isLoggedIn) {
       this.addressService.getAddressApiCall().subscribe(
         res => {
           this.customerAddresses = res;
-          console.log(res)
-          this.showAddressDetails = true;  // Set the flag to true to show address details
-          console.log(res)
+          console.log(res);
+          this.showAddressDetails = true;
         },
         err => {
           console.error(err);
           this.customerAddresses = [];
-          this.showAddressDetails = true;  // Set the flag to true even if there are no addresses
+          this.showAddressDetails = true;
         }
       );
     } else {
@@ -141,50 +137,33 @@ export class MyOrderComponent implements OnInit {
         disableClose: true,
         autoFocus: false,
       });
-      dialogRef.afterClosed().subscribe(result=>{
-        if(this.isLoggedIn){dialogRef.close()}
-     } )
+      dialogRef.afterClosed().subscribe(result => {
+        if (this.isLoggedIn) {
+          dialogRef.close();
+        }
+      });
     }
   }
 
-  
-  
-  
-
-  addNewAddress()
-  {
-    this.showAddressForm = true; // Show the address form
-
+  addNewAddress() {
+    this.showAddressForm = true;
   }
-  editAddress(address:AddressObj)
-  {
 
-  }
-  
-
-  handleaddress() {
+  handleAddress() {
     if (this.addressForm.valid) {
       const newAddress: AddressObj = this.addressForm.value;
       this.addressService.addCustomerAddressApiCall(newAddress).subscribe(
-        (response: any) => {
-          
+        response => {
           console.log("New address added:", response);
-          
-          this.addressForm.reset(); 
-          this.addressService.getAddressApiCall().subscribe(
-            (response:any)=>{
-              
-            }
-          );
-          // Reset the form after successful submission
+          this.customerAddresses.push(response);
+          this.addressForm.reset();
+          this.showAddressForm = false;
         },
-        (error: any) => {
+        error => {
           console.error("Error adding new address:", error);
-
         }
       );
     } else {
-      // Mark all form controls as touched to trigger validation messages
       Object.keys(this.addressForm.controls).forEach(controlName => {
         this.addressForm.get(controlName)?.markAsTouched();
       });
@@ -192,26 +171,17 @@ export class MyOrderComponent implements OnInit {
   }
 
   toggleAddressForm() {
-    // Toggle the visibility of the address form
     this.showAddressForm = !this.showAddressForm;
   }
 
-
-
-
-
-
   removeAddress(address: AddressObj) {
-    const phoneNumber = address.mobileNumber; // Assuming mobileNumber corresponds to phoneNumber
+    const phoneNumber = address.MobileNumber;
     console.log(phoneNumber);
-    if (this.isLoggedIn && phoneNumber !== undefined && phoneNumber !== null) {
+    if (this.isLoggedIn && phoneNumber) {
       this.addressService.removeAddressApiCall(phoneNumber).subscribe(
         () => {
-          
           console.log("Address removed successfully:", address);
-          // Update the local list of addresses
-          this.customerAddresses = this.customerAddresses.filter(a => a.mobileNumber !== phoneNumber);
-
+          this.customerAddresses = this.customerAddresses.filter(a => a.MobileNumber !== phoneNumber);
         },
         error => console.error("Error removing address:", error)
       );
@@ -219,7 +189,56 @@ export class MyOrderComponent implements OnInit {
       console.log("User is not authenticated or phone number is invalid. Cannot remove address.");
     }
   }
-  
-  
-}
 
+  continueOrder(): void {
+    if (this.addressForm.valid) {
+      const newAddress: AddressObj = this.addressForm.value;
+
+      if (this.isEditing && this.editingAddressId !== null) {
+        this.addressService.editAddressApiCall(this.editingAddressId, newAddress).subscribe(
+          res => {
+            const index = this.customerAddresses.findIndex(addr => addr.AddressId === this.editingAddressId);
+            if (index !== -1) {
+              this.customerAddresses[index] = newAddress;
+            }
+            this.resetAddressForm();
+          },
+          err => console.error(err)
+        );
+      } else {
+        this.addressService.addCustomerAddressApiCall(newAddress).subscribe(
+          res => {
+            this.customerAddresses.push(res);
+            this.resetAddressForm();
+          },
+          err => console.error(err)
+        );
+      }
+    }
+  }
+
+  resetAddressForm(): void {
+    this.showAddressForm = false;
+    this.showOrderSummary = true;
+    this.showAddressDetails = true;
+    this.isEditing = false;
+    this.editingAddressId = null;
+    this.addressForm.reset();
+  }
+
+  editAddress(address: AddressObj): void {
+    this.isEditing = true;
+    this.editingAddressId = address.AddressId;
+    this.showAddressForm = true;
+    this.addressForm.patchValue(address);
+  }
+
+  continueToProductDetails() {
+    this.showOrderSummary = true;
+  }
+
+  checkout() {
+    console.log("Proceed to checkout");
+    // Implementation of checkout method
+  }
+}
