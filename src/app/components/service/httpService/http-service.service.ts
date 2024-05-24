@@ -84,15 +84,13 @@ private staticTokenHeader = new HttpHeaders({
     return this.http.get(`https://localhost:7142/api/Address`,{ headers: this.staticTokenHeader  })
   }
 
-
-  // editAddress(phoneNumber: number, address: string): Observable<any> {
-  //   return this.http.patch(`https://localhost:7142/api/Address/${phoneNumber}`, { address }, { headers: this.staticTokenHeader  });
-  // }
+  editAddressApiCall(addressId: number,body:AddressObj): Observable<any> {
+    return this.http.put(`https://localhost:7142/api/Address/UpdateAddress/${addressId}`, body, { headers: this.staticTokenHeader });
+  }
+  
   
 
   addCustomerAddress(address: AddressObj): Observable<any> {
-    // Assuming you have authentication headers defined somewhere (this.authHeader)
-    // Make sure the URL is correct and matches the server endpoint
     return this.http.post('https://localhost:7142/api/Address', address, { headers: this.staticTokenHeader  });
   }
 
